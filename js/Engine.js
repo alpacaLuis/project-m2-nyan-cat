@@ -14,9 +14,20 @@ class Engine {
     // Initially, we have no enemies in the game. The enemies property refers to an array
     // that contains instances of the Enemy class
     this.enemies = [];
+    // score Display here if not it will keep getting New Text on top
+    this.scoreDisplay = new Text (this.root, 15, 20)
     // We add the background image to the game
     addBackground(this.root);
+    // Score
+    this.score = 0
+    // Start time
+    this.startTime = null
+    // Slower Score
+    this.realScore = 0
+    // Restart Text 
+    this.restartText = new Text (this.root, 100, 200)
   }
+
 
   // The gameLoop will run every few milliseconds. It does several things
   //  - Updates the enemy positions
@@ -26,6 +37,28 @@ class Engine {
     // This code is to see how much time, in milliseconds, has elapsed since the last
     // time this method was called.
     // (new Date).getTime() evaluates to the number of milliseconds since January 1st, 1970 at midnight.
+
+    //Game restart testing
+
+    // Score Alg
+    if(!this.startTime){
+      this.startTime = new Date().getTime()
+    }
+    this.currentTime = new Date().getTime()
+
+    this.score = this.currentTime - this.startTime
+    console.log(this.score)
+    this.realScore = Math.floor(this.score * 0.25)
+    console.log(this.realScore)
+    // until heeerrre
+
+    // Let's display the score now
+    this.scoreDisplay.update(this.realScore)
+    
+    // ----- Until Here ------
+
+
+
     if (this.lastFrame === undefined) {
       this.lastFrame = new Date().getTime();
     }
@@ -35,6 +68,10 @@ class Engine {
     this.lastFrame = new Date().getTime();
     // We use the number of milliseconds since the last call to gameLoop to update the enemy positions.
     // Furthermore, if any enemy is below the bottom of our game, its destroyed property will be set. (See Enemy.js)
+
+    // console.log(this.lastFrame,timeDiff)
+    
+
     this.enemies.forEach((enemy) => {
       enemy.update(timeDiff);
     });
@@ -57,7 +94,25 @@ class Engine {
     // We check if the player is dead. If he is, we alert the user
     // and return from the method (Why is the return statement important?)
     if (this.isPlayerDead()) {
-      window.alert('Game over');
+      let audio = document.getElementById("gamelost")
+      audio.play()
+      // Display text for score 
+      this.restartText.update(`You lost! Your score is ${this.realScore}. Wanna restart?!`)
+      // create button for restarting
+      let restartButton = document.createElement("button")
+      restartButton.innerHTML = "Click me"
+      restartButton.style.position = "absolute"
+      restartButton.style.left = 345
+      restartButton.style.top = 400
+      restartButton.style.zIndex = 2000
+
+      this.root.appendChild(restartButton)
+
+      restartButton.onclick = function(){
+        //to restart the game without reloading page-> reset values(enemies +score then call restartButton.onclick(gameEngine.gameLoop()))
+        window.location.reload() 
+      }
+
       return;
     }
 
@@ -71,13 +126,6 @@ class Engine {
 
   isPlayerDead = () => {
     const enemy = this.enemies.find((enemy) => {
-
-      if(this.player.x === enemy.x){
-        console.log(enemy)
-        console.log(this.player)
-
-      }
-
       if ((this.player.x === enemy.x) && (this.player.y <= enemy.y + ENEMY_HEIGHT)){
         return true 
       } else {
