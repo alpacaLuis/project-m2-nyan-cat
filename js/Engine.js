@@ -26,6 +26,8 @@ class Engine {
     this.realScore = 0
     // Restart Text 
     this.restartText = new Text (this.root, 100, 200)
+    // Lives
+    this.lives = 3
   }
 
 
@@ -56,7 +58,6 @@ class Engine {
     this.scoreDisplay.update(this.realScore)
     
     // ----- Until Here ------
-
 
 
     if (this.lastFrame === undefined) {
